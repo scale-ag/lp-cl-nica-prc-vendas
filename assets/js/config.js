@@ -8,7 +8,7 @@
 window.PRC_CONFIG = {
   /* Valores exibidos na página */
   VALOR_SINAL: 50,          // sinal cobrado agora (R$)
-  VALOR_CONSULTA: 600,      // valor cheio da consulta (R$)
+  VALOR_CONSULTA: 600,      // valor total da consulta (R$); o sinal é abatido dele
 
   /* WhatsApp da clínica (só números, com 55 + DDD) */
   WHATSAPP: "5511969988757",
@@ -36,9 +36,8 @@ window.PRC_CONFIG = {
    * Dispara: PageView, Lead (formulário) e InitiateCheckout (pagar). */
   META_PIXEL_ID: "371557988328730",
 
-  /* ---------- REGRAS DO SINAL (perguntas frequentes) ----------
+  /* ---------- REMARCAÇÃO (pergunta frequente) ----------
    * Ajuste o texto conforme a regra da clínica.
    * Deixe "" (vazio) para esconder a pergunta da página. */
-  RESPOSTA_SINAL_DESCONTADO: "Sim. O valor do sinal é abatido do valor da consulta, e o restante é pago no dia do atendimento.",
   RESPOSTA_REMARCAR: "Sim. Basta avisar nossa equipe pelo WhatsApp com antecedência para escolher uma nova data."
 };

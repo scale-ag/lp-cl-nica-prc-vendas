@@ -1,8 +1,10 @@
 # Landing page – Clínica PRC (agendamento com sinal de R$ 50)
 
 Página estática (HTML/CSS/JS puro) para vender o agendamento da consulta tricológica da
-[Clínica PRC](https://clinicadetricologia.com.br/). Em vez do valor cheio (R$ 600), a pessoa paga
-**R$ 50 de sinal** para confirmar o horário.
+[Clínica PRC](https://clinicadetricologia.com.br/). A consulta custa **R$ 600**: a pessoa paga
+**R$ 50 de sinal** agora para reservar o horário, e esse valor é **abatido** dos R$ 600
+(paga os R$ 550 restantes no dia). A página deixa isso explícito em todos os pontos de preço
+e exige que a paciente marque que está ciente antes de seguir para o pagamento.
 
 ## Fluxo da paciente
 
@@ -22,7 +24,8 @@ Edite `assets/js/config.js`:
 | `CHAVE_PIX` | Chave Pix da clínica (CNPJ só números, e-mail, `+5511...` ou aleatória) |
 | `NOME_RECEBEDOR` / `CIDADE_RECEBEDOR` | Nome e cidade do titular da chave, sem acento |
 | `LINK_PAGAMENTO` | Link de R$ 50 do Mercado Pago, InfinitePay, PagSeguro, Asaas etc. |
-| `META_PIXEL_ID` | ID do Pixel da Meta (opcional). Eventos: `PageView`, `Lead`, `InitiateCheckout`, `Contact` |
+| `META_PIXEL_ID` | ID do Pixel da Meta. Eventos: `PageView`, `Lead`, `InitiateCheckout`, `Contact` |
+| `RESPOSTA_REMARCAR` | Texto da pergunta "Posso remarcar?" (vazio esconde a pergunta) |
 
 Se `CHAVE_PIX` e `LINK_PAGAMENTO` ficarem vazios, a página manda a paciente direto para o
 WhatsApp pedir os dados de pagamento.

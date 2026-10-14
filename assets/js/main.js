@@ -17,6 +17,7 @@
   /* ---------- Valores e links fixos ---------- */
   $$("[data-sinal]").forEach(function (el) { el.textContent = brl(C.VALOR_SINAL); });
   $$("[data-consulta]").forEach(function (el) { el.textContent = brl(C.VALOR_CONSULTA); });
+  $$("[data-restante]").forEach(function (el) { el.textContent = brl(C.VALOR_CONSULTA - C.VALOR_SINAL); });
   $$("[data-whats-link]").forEach(function (el) { el.href = waLink(); el.target = "_blank"; el.rel = "noopener"; });
   $("#whats-duvida").href = waLink("Olá! Vim pela página de agendamento e tenho uma dúvida sobre a consulta.");
   $$("[data-faq]").forEach(function (el) {
@@ -86,6 +87,7 @@
     if (digits.length < 10) bad(whats, "Informe um WhatsApp válido com DDD.");
     if (!form.elements.queixa.value) bad(form.elements.queixa, "Selecione sua queixa.");
     if (!form.elements.periodo.value) bad(form.elements.periodo, "Selecione o melhor período.");
+    if (!form.elements.ciente.checked) bad(form.elements.ciente, "Confirme que está ciente dos valores.");
     return msgs;
   }
 
@@ -141,7 +143,9 @@
       "\n\nNome: " + lead.nome +
       "\nWhatsApp: " + lead.whats +
       "\nQueixa: " + lead.queixa +
-      "\nPeríodo preferido: " + lead.periodo;
+      "\nPeríodo preferido: " + lead.periodo +
+      "\n\nEstou ciente: a consulta custa " + brl(C.VALOR_CONSULTA) + ". O sinal de " + brl(C.VALOR_SINAL) +
+      " é abatido e pago os " + brl(C.VALOR_CONSULTA - C.VALOR_SINAL) + " restantes no dia da consulta.";
     $("#whats-confirm").href = waLink(msg);
     $("#whats-confirm").textContent = hasPix || hasLink ? "Enviar comprovante no WhatsApp" : "Agendar pelo WhatsApp";
     $("#confirm-text").innerHTML = hasPix || hasLink
@@ -177,11 +181,15 @@
     track("Contact");
   });
 
-  /* ---------- CTA fixo some quando o checkout está na tela ---------- */
-  var sticky = $(".sticky-cta"), offer = $("#agendar");
+  /* ---------- CTA fixo some no topo (para não cobrir os valores) e no checkout ---------- */
+  var sticky = $(".sticky-cta");
   if ("IntersectionObserver" in window && sticky) {
-    new IntersectionObserver(function (entries) {
-      sticky.classList.toggle("is-hidden", entries[0].isIntersecting);
-    }, { threshold: 0.15 }).observe(offer);
+    var visible = {};
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { visible[en.target.className] = en.isIntersecting; });
+      sticky.classList.toggle("is-hidden", Object.keys(visible).some(function (k) { return visible[k]; }));
+    }, { threshold: 0.05 });
+    io.observe($(".hero"));
+    io.observe($("#agendar"));
   }
 })();

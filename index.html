@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Consulta Tricológica | Clínica PRC – Tatuapé, SP</title>
-  <meta name="description" content="Descubra a causa da sua queda de cabelo com o método PRC – Programa de Reabilitação Capilar. Garanta seu horário com apenas R$ 50 de sinal.">
+  <meta name="description" content="Descubra a causa da sua queda de cabelo com o método PRC – Programa de Reabilitação Capilar. Consulta de R$ 600: reserve seu horário com um sinal de R$ 50, abatido do valor total.">
   <meta name="theme-color" content="#A8A777">
   <meta property="og:title" content="Clínica PRC – Agende sua consulta tricológica">
-  <meta property="og:description" content="Tratamentos personalizados para queda de cabelo e calvície. Reserve seu horário com R$ 50 de sinal.">
+  <meta property="og:description" content="Tratamentos personalizados para queda de cabelo e calvície. Consulta de R$ 600: reserve seu horário com um sinal de R$ 50, abatido do valor total.">
   <meta property="og:image" content="assets/img/dr-joao.jpg">
   <meta property="og:locale" content="pt_BR">
   <link rel="icon" type="image/png" href="assets/img/favicon.png">
@@ -24,7 +24,7 @@
       <a href="#" class="topbar__logo" aria-label="Clínica PRC">
         <img src="assets/img/logo-prc.svg" alt="PRC – Programa de Reabilitação Capilar" width="134" height="50">
       </a>
-      <a href="#agendar" class="btn btn--sm" data-cta>Agendar por <span data-sinal>R$ 50</span></a>
+      <a href="#agendar" class="btn btn--sm" data-cta>Reservar horário</a>
     </div>
   </header>
 
@@ -38,12 +38,16 @@
           <p class="hero__lead">Consulta tricológica completa com o <strong>Método PRC – Programa de Reabilitação Capilar</strong>: um tratamento planejado para o seu caso, seguro e com resultados sustentáveis a longo prazo.</p>
 
           <div class="price-tag">
-            <div class="price-tag__old">Consulta: <s data-consulta>R$ 600</s></div>
-            <div class="price-tag__new">Reserve hoje com <strong data-sinal>R$ 50</strong> <span>de sinal</span></div>
-            <div class="price-tag__note">O sinal confirma o seu horário na agenda.</div>
+            <p class="price-tag__title">Como funciona o pagamento</p>
+            <dl class="breakdown">
+              <div><dt>Valor da consulta</dt><dd data-consulta>R$ 600</dd></div>
+              <div class="breakdown__now"><dt>Agora, para reservar o horário <small>(sinal)</small></dt><dd data-sinal>R$ 50</dd></div>
+              <div><dt>No dia da consulta <small>(restante)</small></dt><dd data-restante>R$ 550</dd></div>
+            </dl>
+            <p class="breakdown__note">O sinal <strong>não é desconto</strong>: ele faz parte dos <span data-consulta>R$ 600</span> e é abatido do valor total da consulta.</p>
           </div>
 
-          <a href="#agendar" class="btn btn--lg" data-cta>Quero garantir meu horário</a>
+          <a href="#agendar" class="btn btn--lg" data-cta>Quero reservar meu horário</a>
           <ul class="hero__checks">
             <li>Pagamento rápido via Pix ou cartão</li>
             <li>Confirmação do horário pelo WhatsApp</li>
@@ -143,7 +147,7 @@
       <div class="container">
         <div class="center narrow">
           <span class="eyebrow eyebrow--light">Como funciona</span>
-          <h2>Seu horário garantido em 3 passos</h2>
+          <h2>Seu horário garantido em 4 passos</h2>
         </div>
         <ol class="steps">
           <li>
@@ -154,12 +158,17 @@
           <li>
             <span class="steps__n">2</span>
             <h3>Pague o sinal de <span data-sinal>R$ 50</span></h3>
-            <p>Via Pix ou cartão. O sinal reserva o seu horário na agenda da clínica.</p>
+            <p>Via Pix ou cartão. O sinal reserva o seu horário e já é parte do valor da consulta.</p>
           </li>
           <li>
             <span class="steps__n">3</span>
             <h3>Confirme no WhatsApp</h3>
             <p>Nossa equipe confirma com você o dia e o horário da sua consulta.</p>
+          </li>
+          <li>
+            <span class="steps__n">4</span>
+            <h3>No dia, pague o restante</h3>
+            <p>Os <span data-restante>R$ 550</span> restantes são pagos na clínica. Total da consulta: <span data-consulta>R$ 600</span>.</p>
           </li>
         </ol>
       </div>
@@ -289,8 +298,12 @@
             <li>Tempo para tirar todas as suas dúvidas</li>
           </ul>
           <div class="offer__price">
-            <div class="offer__old">Valor da consulta: <s data-consulta>R$ 600</s></div>
-            <div class="offer__new"><span>Sinal para reservar</span><strong data-sinal>R$ 50</strong></div>
+            <dl class="breakdown breakdown--dark">
+              <div><dt>Valor da consulta</dt><dd data-consulta>R$ 600</dd></div>
+              <div class="breakdown__now"><dt>Agora, para reservar o horário <small>(sinal)</small></dt><dd data-sinal>R$ 50</dd></div>
+              <div><dt>No dia da consulta <small>(restante)</small></dt><dd data-restante>R$ 550</dd></div>
+            </dl>
+            <p class="breakdown__note">O sinal <strong>não é desconto</strong>: ele faz parte dos <span data-consulta>R$ 600</span> e é abatido do valor total da consulta.</p>
           </div>
           <p class="offer__address">Rua Catiguá, 159 – Conj. 910 · Tatuapé · São Paulo – SP</p>
         </div>
@@ -327,6 +340,10 @@
                 <option>Qualquer horário</option>
               </select>
             </label>
+            <label class="aware">
+              <input type="checkbox" name="ciente" required>
+              <span>Estou ciente de que a consulta custa <strong data-consulta>R$ 600</strong>. Pago agora <strong data-sinal>R$ 50</strong> de sinal, que serão abatidos, e os <strong data-restante>R$ 550</strong> restantes no dia da consulta.</span>
+            </label>
             <p class="form-error" id="form-error" role="alert" hidden></p>
             <button type="submit" class="btn btn--lg btn--block">Continuar para o pagamento</button>
             <p class="checkout__safe">Seus dados são usados só para o agendamento.</p>
@@ -338,6 +355,11 @@
               <span class="checkout__badge">Passo 2 de 2</span>
               <h3>Pague o sinal de <span data-sinal>R$ 50</span></h3>
               <p class="checkout__hello" id="pay-hello"></p>
+            </div>
+            <div class="summary">
+              <div><span>Valor da consulta</span><strong data-consulta>R$ 600</strong></div>
+              <div class="summary__now"><span>Sinal a pagar agora</span><strong data-sinal>R$ 50</strong></div>
+              <div><span>A pagar no dia da consulta</span><strong data-restante>R$ 550</strong></div>
             </div>
 
             <div class="pay-option" id="pay-pix" hidden>
@@ -354,7 +376,7 @@
 
             <div class="pay-option" id="pay-link" hidden>
               <h4>Cartão de crédito ou Pix</h4>
-              <a href="#" target="_blank" rel="noopener" class="btn btn--block" id="pay-link-btn">Pagar <span data-sinal>R$ 50</span> agora</a>
+              <a href="#" target="_blank" rel="noopener" class="btn btn--block" id="pay-link-btn">Pagar sinal de <span data-sinal>R$ 50</span></a>
             </div>
 
             <div class="pay-option" id="pay-fallback" hidden>
@@ -379,13 +401,13 @@
           <h2>Perguntas frequentes</h2>
         </div>
         <div class="faq">
+          <details open>
+            <summary>A consulta custa <span data-sinal>R$ 50</span>?</summary>
+            <p><strong>Não.</strong> A consulta custa <strong data-consulta>R$ 600</strong>. Os <span data-sinal>R$ 50</span> são um sinal para reservar o seu horário e são <strong>abatidos</strong> desse valor: no dia da consulta você paga os <strong data-restante>R$ 550</strong> restantes. O total continua sendo <span data-consulta>R$ 600</span>.</p>
+          </details>
           <details>
             <summary>Por que pagar um sinal de <span data-sinal>R$ 50</span>?</summary>
             <p>O sinal garante a reserva do seu horário na agenda da clínica. Assim que recebermos o comprovante, nossa equipe confirma o dia e o horário com você pelo WhatsApp.</p>
-          </details>
-          <details data-faq="RESPOSTA_SINAL_DESCONTADO">
-            <summary>O sinal é descontado do valor da consulta?</summary>
-            <p></p>
           </details>
           <details data-faq="RESPOSTA_REMARCAR">
             <summary>Posso remarcar minha consulta?</summary>
@@ -409,7 +431,7 @@
           </details>
         </div>
         <div class="center">
-          <a href="#agendar" class="btn btn--lg" data-cta>Agendar por <span data-sinal>R$ 50</span></a>
+          <a href="#agendar" class="btn btn--lg" data-cta>Reservar meu horário</a>
           <p class="small">Ainda com dúvidas? <a href="#" id="whats-duvida" target="_blank" rel="noopener">Fale com a gente no WhatsApp</a></p>
         </div>
       </div>
@@ -441,7 +463,7 @@
   </footer>
 
   <!-- CTA fixo no celular -->
-  <a href="#agendar" class="sticky-cta" data-cta>Garantir horário por <strong data-sinal>R$ 50</strong></a>
+  <a href="#agendar" class="sticky-cta" data-cta>Reservar meu horário</a>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
   <script src="assets/js/config.js"></script>
