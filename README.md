@@ -1,17 +1,19 @@
-# Landing page – Clínica PRC (agendamento com sinal de R$ 50)
+# Landing page – Clínica PRC (agendamento pelo WhatsApp)
 
-Página estática (HTML/CSS/JS puro) para vender o agendamento da consulta tricológica da
-[Clínica PRC](https://clinicadetricologia.com.br/). A consulta custa **R$ 600**: a pessoa paga
-**R$ 50 de sinal** agora para reservar o horário, e esse valor é **abatido** dos R$ 600
-(paga os R$ 550 restantes no dia). A página deixa isso explícito em todos os pontos de preço
-e exige que a paciente marque que está ciente antes de seguir para o pagamento.
+Página estática (HTML/CSS/JS puro) para gerar agendamentos da consulta tricológica da
+[Clínica PRC](https://clinicadetricologia.com.br/). A consulta custa **R$ 600**; para reservar o
+horário a paciente paga **R$ 50 de sinal** (pelo WhatsApp), que é **abatido** dos R$ 600 — ela paga
+os R$ 550 restantes no dia. Os valores só aparecem a partir do formulário, e a paciente precisa
+marcar que está ciente antes de enviar.
 
 ## Fluxo da paciente
 
-1. Preenche nome, WhatsApp, queixa e período preferido.
-2. Paga o sinal pelo **Pix** (QR Code + copia e cola gerados na própria página) e/ou por um **link de pagamento** (cartão).
-3. Clica em **Enviar comprovante no WhatsApp**: abre a conversa com a clínica com todos os dados preenchidos.
-4. A equipe confere o pagamento e confirma dia e horário.
+1. Lê a página (dor → causa → método → resultados → depoimentos) e preenche o formulário.
+2. Ao enviar: dispara o evento **Lead** no Pixel da Meta e o lead é gravado na **planilha** com as UTMs.
+3. Aparece uma contagem de **5 segundos** (tempo para o Lead chegar na Meta e o lead cair na planilha).
+4. Redireciona sozinho para o WhatsApp **+55 11 96998-8757** com a mensagem
+   *"Olá, preenchi o formulário do site e gostaria de agendar meu horário"*.
+5. A equipe agenda o horário e cobra o sinal pelo WhatsApp.
 
 ## Configuração (único arquivo a editar)
 
@@ -20,32 +22,44 @@ Edite `assets/js/config.js`:
 | Campo | O que colocar |
 |---|---|
 | `VALOR_SINAL` / `VALOR_CONSULTA` | Valores exibidos (50 e 600) |
-| `WHATSAPP` | Número que recebe os agendamentos (`55` + DDD + número) |
-| `CHAVE_PIX` | Chave Pix da clínica (CNPJ só números, e-mail, `+5511...` ou aleatória) |
-| `NOME_RECEBEDOR` / `CIDADE_RECEBEDOR` | Nome e cidade do titular da chave, sem acento |
-| `LINK_PAGAMENTO` | Link de R$ 50 do Mercado Pago, InfinitePay, PagSeguro, Asaas etc. |
-| `META_PIXEL_ID` | ID do Pixel da Meta. Eventos: `PageView`, `Lead`, `InitiateCheckout`, `Contact` |
+| `WHATSAPP` | Número que recebe os leads (`55` + DDD + número) |
+| `MENSAGEM_WHATSAPP` | Mensagem que já vem escrita no WhatsApp |
+| `SEGUNDOS_ATE_WHATSAPP` | Espera antes de abrir o WhatsApp (padrão 5) |
+| `PLANILHA_URL` | URL `/exec` do Apps Script (veja abaixo) |
+| `META_PIXEL_ID` | ID do Pixel da Meta |
 | `RESPOSTA_REMARCAR` | Texto da pergunta "Posso remarcar?" (vazio esconde a pergunta) |
 
-Se `CHAVE_PIX` e `LINK_PAGAMENTO` ficarem vazios, a página manda a paciente direto para o
-WhatsApp pedir os dados de pagamento.
+## Planilha de leads (Google Sheets)
 
-## Página de obrigado (`obrigado.html`)
+O código fica em `google-apps-script/Codigo.gs`. Instalação (uma vez só, com a conta dona da planilha):
 
-Usada pelo **link de pagamento**: no painel do gateway, configure o redirecionamento após
-pagamento aprovado para
+1. Abra a planilha → **Extensões → Apps Script**.
+2. Apague o conteúdo do editor, cole o arquivo `Codigo.gs` inteiro e salve.
+3. No seletor de funções (topo), escolha **`configurarPlanilha`** → **Executar** → autorize.
+   Isso cria a aba **Leads** com as colunas e a lista de status.
+4. **Implantar → Nova implantação** → engrenagem → **App da Web**:
+   - Executar como: **Eu**
+   - Quem pode acessar: **Qualquer pessoa**
+5. **Implantar**, copie a URL que termina em `/exec` e cole em `PLANILHA_URL`.
+
+Colunas: Data/hora · Nome · WhatsApp · Queixa · Período · **Status** (lista: Novo, Em conversa,
+Agendado, Sinal pago, Compareceu, Não respondeu, Desistiu) · utm_source · utm_medium · utm_campaign ·
+utm_content · utm_term · fbclid · gclid · Dispositivo · Página · ID do lead.
+
+> Se alterar o código depois, use **Implantar → Gerenciar implantações → editar → Nova versão**
+> para manter a mesma URL.
+
+### UTMs nos anúncios da Meta
+
+No anúncio, em **Rastreamento → Parâmetros de URL**, cole:
 
 ```
-https://scale-ag.github.io/lp-cl-nica-prc-vendas/obrigado.html?pago=1
+utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}&utm_term={{adset.name}}
 ```
 
-A página:
-- dispara o evento **Purchase** (R$ 50) no Pixel da Meta, só com `?pago=1` e uma única vez por agendamento;
-- recupera os dados que a paciente preencheu e monta a mensagem de confirmação no WhatsApp;
-- repete o resumo dos valores (R$ 600 / R$ 50 pago / R$ 550 no dia).
-
-O Pix direto da página não passa por gateway, então não há como confirmar o pagamento
-automaticamente: nesse caso a paciente vai direto ao WhatsApp e **não** dispara Purchase.
+A Meta troca as chaves pelos nomes reais: na planilha você vê a **campanha**, o **conjunto** e o
+**anúncio** de cada lead. A página guarda as UTMs da visita, então mesmo que a pessoa saia e volte
+depois pelo link direto, a origem não se perde.
 
 ## Publicar no GitHub Pages
 
@@ -66,12 +80,10 @@ Cada novo commit nessa branch republica o site automaticamente.
 ## Estrutura
 
 ```
-index.html            página
-assets/css/style.css  estilos (cores e fontes da identidade PRC)
-assets/js/config.js   configurações editáveis
-obrigado.html         página de obrigado (pós-pagamento)
-assets/js/common.js   Pixel, valores e WhatsApp (usado nas duas páginas)
-assets/js/main.js     formulário e Pix da landing page
-assets/js/obrigado.js página de obrigado + evento Purchase
-assets/img/           logo e fotos do site da clínica
+index.html                     página
+assets/css/style.css           estilos (cores e fontes da identidade PRC)
+assets/js/config.js            configurações editáveis
+assets/js/main.js              formulário, UTMs, Pixel, planilha e redirecionamento
+assets/img/                    logo e fotos do site da clínica
+google-apps-script/Codigo.gs   script que grava os leads na planilha
 ```

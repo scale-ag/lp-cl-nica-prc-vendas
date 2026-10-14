@@ -6,34 +6,25 @@
  *  atualiza o site sozinho em ~1 minuto.
  */
 window.PRC_CONFIG = {
-  /* Valores exibidos na página */
-  VALOR_SINAL: 50,          // sinal cobrado agora (R$)
+  /* Valores exibidos na página (a partir do formulário) */
+  VALOR_SINAL: 50,          // sinal para reservar o horário (R$)
   VALOR_CONSULTA: 600,      // valor total da consulta (R$); o sinal é abatido dele
 
-  /* WhatsApp da clínica (só números, com 55 + DDD) */
+  /* ---------- WHATSAPP ----------
+   * Depois de preencher o formulário, a pessoa espera alguns segundos
+   * (para o evento Lead chegar na Meta e o lead cair na planilha)
+   * e é levada automaticamente para este WhatsApp. */
   WHATSAPP: "5511969988757",
+  MENSAGEM_WHATSAPP: "Olá, preenchi o formulário do site e gostaria de agendar meu horário",
+  SEGUNDOS_ATE_WHATSAPP: 5,
 
-  /* ---------- PAGAMENTO ----------
-   * Preencha UMA ou AS DUAS opções abaixo.
-   * Se ficar vazia, a opção some da página.
-   */
+  /* ---------- PLANILHA (Google Sheets) ----------
+   * URL do App da Web do Google Apps Script (termina em /exec).
+   * Passo a passo no README, seção "Planilha de leads". */
+  PLANILHA_URL: "",
 
-  /* 1) Link de pagamento de R$ 50 (cartão/Pix) gerado no
-   *    Mercado Pago, InfinitePay, PagSeguro, Asaas, Stripe etc. */
-  LINK_PAGAMENTO: "",
-
-  /* 2) Pix direto: a página gera o QR Code e o "copia e cola"
-   *    já com o valor de R$ 50.
-   *    CHAVE_PIX: CNPJ (só números), e-mail, celular (+5511...) ou chave aleatória.
-   *    NOME_RECEBEDOR: até 25 letras, sem acento (como está no banco).
-   *    CIDADE_RECEBEDOR: até 15 letras, sem acento. */
-  CHAVE_PIX: "",
-  NOME_RECEBEDOR: "PRC CLINICA",
-  CIDADE_RECEBEDOR: "SAO PAULO",
-
-  /* ---------- RASTREAMENTO (opcional) ----------
-   * ID do Pixel da Meta (Facebook/Instagram Ads).
-   * Dispara: PageView, Lead (formulário) e InitiateCheckout (pagar). */
+  /* ---------- RASTREAMENTO ----------
+   * ID do Pixel da Meta. Dispara PageView e Lead (formulário enviado). */
   META_PIXEL_ID: "371557988328730",
 
   /* ---------- REMARCAÇÃO (pergunta frequente) ----------

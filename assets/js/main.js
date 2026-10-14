@@ -1,47 +1,62 @@
 (function () {
   "use strict";
 
-  var P = window.PRC, C = P.C, brl = P.brl, waLink = P.waLink, track = P.track;
+  var C = window.PRC_CONFIG || {};
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
 
+  function brl(v) {
+    return "R$ " + Number(v).toLocaleString("pt-BR", {
+      minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2
+    });
+  }
+  function waLink(text) {
+    return "https://wa.me/" + C.WHATSAPP + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+  function track(ev, params, opts) { if (window.fbq) window.fbq("track", ev, params || {}, opts || {}); }
+
+  /* ---------- Valores e links fixos ---------- */
+  $$("[data-sinal]").forEach(function (el) { el.textContent = brl(C.VALOR_SINAL); });
+  $$("[data-consulta]").forEach(function (el) { el.textContent = brl(C.VALOR_CONSULTA); });
+  $$("[data-restante]").forEach(function (el) { el.textContent = brl(C.VALOR_CONSULTA - C.VALOR_SINAL); });
+  $$("[data-whats-link]").forEach(function (el) { el.href = waLink(); el.target = "_blank"; el.rel = "noopener"; });
+  $$("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
   $("#whats-duvida").href = waLink("Olá! Vim pela página de agendamento e tenho uma dúvida sobre a consulta.");
   $$("[data-faq]").forEach(function (el) {
     var txt = (C[el.getAttribute("data-faq")] || "").trim();
     if (txt) $("p", el).textContent = txt; else el.remove();
   });
 
-  /* ---------- Pix "copia e cola" (BR Code estático) ---------- */
-  function tlv(id, value) { return id + String(value.length).padStart(2, "0") + value; }
-  function clean(s, max) {
-    return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
-      .replace(/[^A-Za-z0-9 ]/g, "").toUpperCase().trim().slice(0, max);
-  }
-  function crc16(str) {
-    var crc = 0xFFFF;
-    for (var i = 0; i < str.length; i++) {
-      crc ^= str.charCodeAt(i) << 8;
-      for (var j = 0; j < 8; j++) crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
-      crc &= 0xFFFF;
-    }
-    return crc.toString(16).toUpperCase().padStart(4, "0");
-  }
-  function pixPayload(key, name, city, amount, txid) {
-    var p = tlv("00", "01") +
-      tlv("26", tlv("00", "br.gov.bcb.pix") + tlv("01", key.trim())) +
-      tlv("52", "0000") + tlv("53", "986") +
-      tlv("54", Number(amount).toFixed(2)) +
-      tlv("58", "BR") +
-      tlv("59", clean(name, 25) || "PRC") +
-      tlv("60", clean(city, 15) || "SAO PAULO") +
-      tlv("62", tlv("05", txid)) + "6304";
-    return p + crc16(p);
+  /* ---------- Meta Pixel ---------- */
+  if (C.META_PIXEL_ID) {
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+    }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+    window.fbq("init", C.META_PIXEL_ID);
+    track("PageView");
   }
 
-  /* ---------- Checkout ---------- */
-  var form = $("#step-form"), pay = $("#step-pay"), err = $("#form-error");
+  /* ---------- UTMs ----------
+   * Guarda os parâmetros do anúncio da última visita que veio com UTM,
+   * para não perder a origem se a pessoa sair e voltar depois. */
+  var UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "gclid"];
+  var UTM_STORE = "prc_utm";
+  function readUtms() {
+    var qs = new URLSearchParams(location.search), now = {}, has = false;
+    UTM_KEYS.forEach(function (k) { var v = qs.get(k); if (v) { now[k] = v; has = true; } });
+    try {
+      if (has) { localStorage.setItem(UTM_STORE, JSON.stringify(now)); return now; }
+      return JSON.parse(localStorage.getItem(UTM_STORE) || "{}");
+    } catch (e) { return now; }
+  }
+  var utms = readUtms();
+
+  /* ---------- Formulário ---------- */
+  var form = $("#step-form"), done = $("#step-done"), err = $("#form-error");
   var whats = form.elements.whats;
-  var lead = null;
+  var sent = false;
 
   whats.addEventListener("input", function () {
     var d = whats.value.replace(/\D/g, "").slice(0, 11);
@@ -56,16 +71,31 @@
     $$("input, select", form).forEach(function (f) { f.removeAttribute("aria-invalid"); });
     function bad(f, m) { f.setAttribute("aria-invalid", "true"); msgs.push(m); }
     if (form.elements.nome.value.trim().length < 3) bad(form.elements.nome, "Informe seu nome.");
-    var digits = whats.value.replace(/\D/g, "");
-    if (digits.length < 10) bad(whats, "Informe um WhatsApp válido com DDD.");
+    if (whats.value.replace(/\D/g, "").length < 10) bad(whats, "Informe um WhatsApp válido com DDD.");
     if (!form.elements.queixa.value) bad(form.elements.queixa, "Selecione sua queixa.");
     if (!form.elements.periodo.value) bad(form.elements.periodo, "Selecione o melhor período.");
     if (!form.elements.ciente.checked) bad(form.elements.ciente, "Confirme que está ciente dos valores.");
     return msgs;
   }
 
+  /* Envia o lead para a planilha (Google Apps Script).
+     text/plain + no-cors evita bloqueio de CORS; keepalive mantém o envio
+     mesmo quando a página é trocada pelo WhatsApp. */
+  function sendToSheet(lead) {
+    if (!C.PLANILHA_URL) return;
+    var body = JSON.stringify(lead);
+    var beacon = function () { if (navigator.sendBeacon) navigator.sendBeacon(C.PLANILHA_URL, body); };
+    try {
+      fetch(C.PLANILHA_URL, {
+        method: "POST", mode: "no-cors", keepalive: true,
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, body: body
+      }).catch(beacon);
+    } catch (e) { beacon(); }
+  }
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
+    if (sent) return;
     var msgs = validate();
     if (msgs.length) {
       err.textContent = msgs.join(" ");
@@ -75,83 +105,57 @@
       return;
     }
     err.hidden = true;
-    lead = {
+    sent = true;
+
+    var leadId = "lead-" + Date.now();
+    var lead = {
+      id: leadId,
       nome: form.elements.nome.value.trim(),
-      whats: whats.value,
+      whatsapp: whats.value,
       queixa: form.elements.queixa.value,
       periodo: form.elements.periodo.value,
-      id: Date.now()
+      utm_source: utms.utm_source || "",
+      utm_medium: utms.utm_medium || "",
+      utm_campaign: utms.utm_campaign || "",
+      utm_content: utms.utm_content || "",
+      utm_term: utms.utm_term || "",
+      fbclid: utms.fbclid || "",
+      gclid: utms.gclid || "",
+      pagina: location.href.split("#")[0],
+      dispositivo: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? "Celular" : "Computador"
     };
-    P.saveLead(lead);
-    track("Lead", { value: C.VALOR_SINAL, currency: "BRL" });
-    showPayment();
+
+    track("Lead", { content_name: "Agendamento consulta PRC" }, { eventID: leadId });
+    sendToSheet(lead);
+    showCountdown(lead.nome.split(" ")[0]);
   });
 
-  function showPayment() {
-    var first = lead.nome.split(" ")[0];
-    $("#pay-hello").textContent = first + ", falta só o sinal para reservar o seu horário.";
+  /* ---------- Contagem e redirecionamento para o WhatsApp ----------
+   * A espera dá tempo do evento Lead chegar na Meta e do lead cair na planilha. */
+  function showCountdown(firstName) {
+    var url = waLink(C.MENSAGEM_WHATSAPP);
+    var left = Math.max(1, Number(C.SEGUNDOS_ATE_WHATSAPP) || 5);
+    var countEl = $("#done-count"), btn = $("#done-whats");
 
-    var hasPix = !!(C.CHAVE_PIX && C.CHAVE_PIX.trim());
-    var hasLink = !!(C.LINK_PAGAMENTO && C.LINK_PAGAMENTO.trim());
-
-    $("#pay-pix").hidden = !hasPix;
-    $("#pay-link").hidden = !hasLink;
-    $("#pay-fallback").hidden = hasPix || hasLink;
-
-    if (hasPix) {
-      var code = pixPayload(C.CHAVE_PIX, C.NOME_RECEBEDOR, C.CIDADE_RECEBEDOR, C.VALOR_SINAL, "PRCSINAL");
-      $("#pix-code").value = code;
-      var box = $("#pix-qr");
-      box.innerHTML = "";
-      if (window.qrcode) {
-        var qr = window.qrcode(0, "M");
-        qr.addData(code);
-        qr.make();
-        box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-      }
-    }
-    if (hasLink) $("#pay-link-btn").href = C.LINK_PAGAMENTO.trim();
-
-    var msg = (hasPix || hasLink
-      ? "Olá! Acabei de pagar o sinal de " + brl(C.VALOR_SINAL) + " para agendar minha consulta na Clínica PRC. Segue o comprovante."
-      : "Olá! Quero agendar minha consulta na Clínica PRC e pagar o sinal de " + brl(C.VALOR_SINAL) + ".") +
-      "\n\n" + P.dadosLead(lead) + "\n\n" + P.avisoValores();
-    $("#whats-confirm").href = waLink(msg);
-    $("#whats-confirm").textContent = hasPix || hasLink ? "Enviar comprovante no WhatsApp" : "Agendar pelo WhatsApp";
-    $("#confirm-text").innerHTML = hasPix || hasLink
-      ? "<strong>Já pagou?</strong> Envie o comprovante para confirmarmos o seu horário:"
-      : "Seus dados já vão preenchidos na mensagem:";
-
+    $("#done-title").textContent = "Pronto, " + firstName + "! Recebemos seus dados.";
+    btn.href = url;
+    countEl.textContent = left;
     form.hidden = true;
-    pay.hidden = false;
-    $("#checkout").scrollIntoView({ behavior: "smooth", block: "start" });
+    done.hidden = false;
+    $("#checkout").scrollIntoView({ behavior: "smooth", block: "center" });
+
+    var timer = setInterval(function () {
+      left -= 1;
+      countEl.textContent = Math.max(left, 0);
+      if (left <= 0) {
+        clearInterval(timer);
+        btn.hidden = false;          // caso o navegador não abra o WhatsApp sozinho
+        window.location.href = url;
+      }
+    }, 1000);
   }
 
-  $("#back-form").addEventListener("click", function () {
-    pay.hidden = true;
-    form.hidden = false;
-    form.elements.nome.focus();
-  });
-
-  $("#pix-copy").addEventListener("click", function () {
-    var ta = $("#pix-code"), btn = this;
-    var done = function () {
-      btn.textContent = "Código copiado!";
-      setTimeout(function () { btn.textContent = "Copiar código Pix"; }, 2500);
-    };
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); document.execCommand("copy"); done(); });
-    } else { ta.select(); document.execCommand("copy"); done(); }
-    track("InitiateCheckout", { value: C.VALOR_SINAL, currency: "BRL", content_name: "Pix" });
-  });
-  $("#pay-link-btn").addEventListener("click", function () {
-    track("InitiateCheckout", { value: C.VALOR_SINAL, currency: "BRL", content_name: "Link" });
-  });
-  $("#whats-confirm").addEventListener("click", function () {
-    track("Contact");
-  });
-
-  /* ---------- CTA fixo some no topo (para não cobrir os valores) e no checkout ---------- */
+  /* ---------- CTA fixo some no topo (para não cobrir o texto) e no formulário ---------- */
   var sticky = $(".sticky-cta");
   if ("IntersectionObserver" in window && sticky) {
     var visible = {};

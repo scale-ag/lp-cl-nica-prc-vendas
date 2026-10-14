@@ -312,20 +312,20 @@
           <div class="offer__price">
             <dl class="breakdown breakdown--dark">
               <div><dt>Valor da consulta</dt><dd data-consulta>R$ 600</dd></div>
-              <div class="breakdown__now"><dt>Agora, para reservar o horário <small>(sinal)</small></dt><dd data-sinal>R$ 50</dd></div>
+              <div class="breakdown__now"><dt>Sinal para reservar o horário</dt><dd data-sinal>R$ 50</dd></div>
               <div><dt>No dia da consulta <small>(restante)</small></dt><dd data-restante>R$ 550</dd></div>
             </dl>
-            <p class="breakdown__note">O sinal <strong>não é desconto</strong>: ele faz parte dos <span data-consulta>R$ 600</span> e é abatido do valor total da consulta.</p>
+            <p class="breakdown__note">O sinal <strong>não é desconto</strong>: ele faz parte dos <span data-consulta>R$ 600</span> e é abatido do valor total da consulta. Você paga o sinal pelo WhatsApp, quando nossa equipe confirmar o seu horário.</p>
           </div>
           <p class="offer__address">Rua Catiguá, 159 – Conj. 910 · Tatuapé · São Paulo – SP</p>
         </div>
 
         <div class="checkout" id="checkout">
-          <!-- Etapa 1: dados -->
+          <!-- Formulário -->
           <form class="checkout__step" id="step-form" novalidate>
             <div class="checkout__head">
-              <span class="checkout__badge">Passo 1 de 2</span>
-              <h3>Seus dados</h3>
+              <h3>Agende seu horário</h3>
+              <p class="checkout__hello">Preencha seus dados e continue pelo WhatsApp.</p>
             </div>
             <label>Nome completo
               <input type="text" name="nome" autocomplete="name" required placeholder="Como podemos te chamar?">
@@ -354,52 +354,22 @@
             </label>
             <label class="aware">
               <input type="checkbox" name="ciente" required>
-              <span>Estou ciente de que a consulta custa <strong data-consulta>R$ 600</strong>. Pago agora <strong data-sinal>R$ 50</strong> de sinal, que serão abatidos, e os <strong data-restante>R$ 550</strong> restantes no dia da consulta.</span>
+              <span>Estou ciente de que a consulta custa <strong data-consulta>R$ 600</strong>. Para reservar o horário pago <strong data-sinal>R$ 50</strong> de sinal, que serão abatidos, e os <strong data-restante>R$ 550</strong> restantes no dia da consulta.</span>
             </label>
             <p class="form-error" id="form-error" role="alert" hidden></p>
-            <button type="submit" class="btn btn--lg btn--block">Continuar para o pagamento</button>
+            <button type="submit" class="btn btn--lg btn--block">Agendar pelo WhatsApp</button>
             <p class="checkout__safe">Seus dados são usados só para o agendamento.</p>
           </form>
 
-          <!-- Etapa 2: pagamento -->
-          <div class="checkout__step" id="step-pay" hidden>
-            <div class="checkout__head">
-              <span class="checkout__badge">Passo 2 de 2</span>
-              <h3>Pague o sinal de <span data-sinal>R$ 50</span></h3>
-              <p class="checkout__hello" id="pay-hello"></p>
+          <!-- Enviado: contagem e redirecionamento para o WhatsApp -->
+          <div class="checkout__step done" id="step-done" hidden aria-live="polite">
+            <div class="done__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="34" height="34"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="summary">
-              <div><span>Valor da consulta</span><strong data-consulta>R$ 600</strong></div>
-              <div class="summary__now"><span>Sinal a pagar agora</span><strong data-sinal>R$ 50</strong></div>
-              <div><span>A pagar no dia da consulta</span><strong data-restante>R$ 550</strong></div>
-            </div>
-
-            <div class="pay-option" id="pay-pix" hidden>
-              <h4>Pix</h4>
-              <div class="pix">
-                <div class="pix__qr" id="pix-qr" aria-label="QR Code Pix"></div>
-                <div class="pix__code">
-                  <p>Escaneie o QR Code no app do seu banco ou copie o código:</p>
-                  <textarea id="pix-code" readonly rows="3"></textarea>
-                  <button type="button" class="btn btn--ghost btn--block" id="pix-copy">Copiar código Pix</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="pay-option" id="pay-link" hidden>
-              <h4>Cartão de crédito ou Pix</h4>
-              <a href="#" target="_blank" rel="noopener" class="btn btn--block" id="pay-link-btn">Pagar sinal de <span data-sinal>R$ 50</span></a>
-            </div>
-
-            <div class="pay-option" id="pay-fallback" hidden>
-              <p>Clique abaixo e nossa equipe envia os dados para o pagamento do sinal pelo WhatsApp.</p>
-            </div>
-
-            <div class="checkout__confirm">
-              <p id="confirm-text"><strong>Já pagou?</strong> Envie o comprovante para confirmarmos o seu horário:</p>
-              <a href="#" target="_blank" rel="noopener" class="btn btn--whats btn--lg btn--block" id="whats-confirm">Confirmar agendamento no WhatsApp</a>
-            </div>
-            <button type="button" class="linklike" id="back-form">← Corrigir meus dados</button>
+            <h3 id="done-title">Recebemos seus dados!</h3>
+            <p>Você será direcionada para o nosso WhatsApp para escolher o seu horário em</p>
+            <div class="done__count"><span id="done-count">5</span><small>segundos</small></div>
+            <a href="#" class="btn btn--whats btn--lg btn--block" id="done-whats" hidden>Abrir o WhatsApp</a>
           </div>
         </div>
       </div>
@@ -477,9 +447,7 @@
   <!-- CTA fixo no celular -->
   <a href="#agendar" class="sticky-cta" data-cta>Reservar meu horário</a>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
   <script src="assets/js/config.js"></script>
-  <script src="assets/js/common.js"></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>
