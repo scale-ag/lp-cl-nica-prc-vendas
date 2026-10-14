@@ -19,6 +19,10 @@
   $$("[data-consulta]").forEach(function (el) { el.textContent = brl(C.VALOR_CONSULTA); });
   $$("[data-whats-link]").forEach(function (el) { el.href = waLink(); el.target = "_blank"; el.rel = "noopener"; });
   $("#whats-duvida").href = waLink("Olá! Vim pela página de agendamento e tenho uma dúvida sobre a consulta.");
+  $$("[data-faq]").forEach(function (el) {
+    var txt = (C[el.getAttribute("data-faq")] || "").trim();
+    if (txt) $("p", el).textContent = txt; else el.remove();
+  });
   $("#year").textContent = new Date().getFullYear();
 
   /* ---------- Meta Pixel (opcional) ---------- */

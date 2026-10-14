@@ -34,5 +34,11 @@ window.PRC_CONFIG = {
   /* ---------- RASTREAMENTO (opcional) ----------
    * ID do Pixel da Meta (Facebook/Instagram Ads).
    * Dispara: PageView, Lead (formulário) e InitiateCheckout (pagar). */
-  META_PIXEL_ID: ""
+  META_PIXEL_ID: "371557988328730",
+
+  /* ---------- REGRAS DO SINAL (perguntas frequentes) ----------
+   * Ajuste o texto conforme a regra da clínica.
+   * Deixe "" (vazio) para esconder a pergunta da página. */
+  RESPOSTA_SINAL_DESCONTADO: "Sim. O valor do sinal é abatido do valor da consulta, e o restante é pago no dia do atendimento.",
+  RESPOSTA_REMARCAR: "Sim. Basta avisar nossa equipe pelo WhatsApp com antecedência para escolher uma nova data."
 };
