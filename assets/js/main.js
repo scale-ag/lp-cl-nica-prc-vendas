@@ -1,42 +1,15 @@
 (function () {
   "use strict";
 
-  var C = window.PRC_CONFIG || {};
+  var P = window.PRC, C = P.C, brl = P.brl, waLink = P.waLink, track = P.track;
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
 
-  function brl(v) {
-    return "R$ " + Number(v).toLocaleString("pt-BR", {
-      minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2
-    });
-  }
-  function waLink(text) {
-    return "https://wa.me/" + C.WHATSAPP + (text ? "?text=" + encodeURIComponent(text) : "");
-  }
-
-  /* ---------- Valores e links fixos ---------- */
-  $$("[data-sinal]").forEach(function (el) { el.textContent = brl(C.VALOR_SINAL); });
-  $$("[data-consulta]").forEach(function (el) { el.textContent = brl(C.VALOR_CONSULTA); });
-  $$("[data-restante]").forEach(function (el) { el.textContent = brl(C.VALOR_CONSULTA - C.VALOR_SINAL); });
-  $$("[data-whats-link]").forEach(function (el) { el.href = waLink(); el.target = "_blank"; el.rel = "noopener"; });
   $("#whats-duvida").href = waLink("Olá! Vim pela página de agendamento e tenho uma dúvida sobre a consulta.");
   $$("[data-faq]").forEach(function (el) {
     var txt = (C[el.getAttribute("data-faq")] || "").trim();
     if (txt) $("p", el).textContent = txt; else el.remove();
   });
-  $("#year").textContent = new Date().getFullYear();
-
-  /* ---------- Meta Pixel (opcional) ---------- */
-  function track(ev, params) { if (window.fbq) window.fbq("track", ev, params || {}); }
-  if (C.META_PIXEL_ID) {
-    !function (f, b, e, v, n, t, s) {
-      if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
-      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
-      t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
-    }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
-    window.fbq("init", C.META_PIXEL_ID);
-    track("PageView");
-  }
 
   /* ---------- Pix "copia e cola" (BR Code estático) ---------- */
   function tlv(id, value) { return id + String(value.length).padStart(2, "0") + value; }
@@ -106,8 +79,10 @@
       nome: form.elements.nome.value.trim(),
       whats: whats.value,
       queixa: form.elements.queixa.value,
-      periodo: form.elements.periodo.value
+      periodo: form.elements.periodo.value,
+      id: Date.now()
     };
+    P.saveLead(lead);
     track("Lead", { value: C.VALOR_SINAL, currency: "BRL" });
     showPayment();
   });
@@ -140,12 +115,7 @@
     var msg = (hasPix || hasLink
       ? "Olá! Acabei de pagar o sinal de " + brl(C.VALOR_SINAL) + " para agendar minha consulta na Clínica PRC. Segue o comprovante."
       : "Olá! Quero agendar minha consulta na Clínica PRC e pagar o sinal de " + brl(C.VALOR_SINAL) + ".") +
-      "\n\nNome: " + lead.nome +
-      "\nWhatsApp: " + lead.whats +
-      "\nQueixa: " + lead.queixa +
-      "\nPeríodo preferido: " + lead.periodo +
-      "\n\nEstou ciente: a consulta custa " + brl(C.VALOR_CONSULTA) + ". O sinal de " + brl(C.VALOR_SINAL) +
-      " é abatido e pago os " + brl(C.VALOR_CONSULTA - C.VALOR_SINAL) + " restantes no dia da consulta.";
+      "\n\n" + P.dadosLead(lead) + "\n\n" + P.avisoValores();
     $("#whats-confirm").href = waLink(msg);
     $("#whats-confirm").textContent = hasPix || hasLink ? "Enviar comprovante no WhatsApp" : "Agendar pelo WhatsApp";
     $("#confirm-text").innerHTML = hasPix || hasLink

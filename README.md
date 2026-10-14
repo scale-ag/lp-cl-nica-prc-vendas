@@ -30,6 +30,23 @@ Edite `assets/js/config.js`:
 Se `CHAVE_PIX` e `LINK_PAGAMENTO` ficarem vazios, a página manda a paciente direto para o
 WhatsApp pedir os dados de pagamento.
 
+## Página de obrigado (`obrigado.html`)
+
+Usada pelo **link de pagamento**: no painel do gateway, configure o redirecionamento após
+pagamento aprovado para
+
+```
+https://scale-ag.github.io/lp-cl-nica-prc-vendas/obrigado.html?pago=1
+```
+
+A página:
+- dispara o evento **Purchase** (R$ 50) no Pixel da Meta, só com `?pago=1` e uma única vez por agendamento;
+- recupera os dados que a paciente preencheu e monta a mensagem de confirmação no WhatsApp;
+- repete o resumo dos valores (R$ 600 / R$ 50 pago / R$ 550 no dia).
+
+O Pix direto da página não passa por gateway, então não há como confirmar o pagamento
+automaticamente: nesse caso a paciente vai direto ao WhatsApp e **não** dispara Purchase.
+
 ## Publicar no GitHub Pages
 
 1. No GitHub, abra o repositório → **Settings** → **Pages** (menu da esquerda).
@@ -52,6 +69,9 @@ Cada novo commit nessa branch republica o site automaticamente.
 index.html            página
 assets/css/style.css  estilos (cores e fontes da identidade PRC)
 assets/js/config.js   configurações editáveis
-assets/js/main.js     formulário, Pix, WhatsApp e Pixel
+obrigado.html         página de obrigado (pós-pagamento)
+assets/js/common.js   Pixel, valores e WhatsApp (usado nas duas páginas)
+assets/js/main.js     formulário e Pix da landing page
+assets/js/obrigado.js página de obrigado + evento Purchase
 assets/img/           logo e fotos do site da clínica
 ```
