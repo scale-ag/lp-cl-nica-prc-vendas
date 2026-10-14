@@ -21,7 +21,7 @@ window.PRC_CONFIG = {
   /* ---------- PLANILHA (Google Sheets) ----------
    * URL do App da Web do Google Apps Script (termina em /exec).
    * Passo a passo no README, seção "Planilha de leads". */
-  PLANILHA_URL: "",
+  PLANILHA_URL: "https://script.google.com/macros/s/AKfycbwalozgWlnvu0Xr8gcfiMTbA1ha2_WjrS1iJHMIPxVmdw5dbt8d6yDejP2327aJoWSs/exec",
 
   /* ---------- RASTREAMENTO ----------
    * ID do Pixel da Meta. Dispara PageView e Lead (formulário enviado). */
