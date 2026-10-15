@@ -11,8 +11,8 @@ marcar que está ciente antes de enviar.
 1. Lê a página (dor → causa → método → resultados → depoimentos) e preenche o formulário.
 2. Ao enviar: dispara o evento **Lead** no Pixel da Meta e o lead é gravado na **planilha** com as UTMs.
 3. Aparece uma contagem de **5 segundos** (tempo para o Lead chegar na Meta e o lead cair na planilha).
-4. Redireciona sozinho para o WhatsApp **+55 11 96998-8757** com a mensagem
-   *"Olá, preenchi o formulário do site e gostaria de agendar meu horário"*.
+4. Redireciona sozinho para o WhatsApp **+55 11 96998-8757** com a mensagem já preenchida
+   com as respostas do lead (nome, queixa e período).
 5. A equipe agenda o horário e cobra o sinal pelo WhatsApp.
 
 ## Configuração (único arquivo a editar)
@@ -23,7 +23,7 @@ Edite `assets/js/config.js`:
 |---|---|
 | `VALOR_SINAL` / `VALOR_CONSULTA` | Valores exibidos (50 e 600) |
 | `WHATSAPP` | Número que recebe os leads (`55` + DDD + número) |
-| `MENSAGEM_WHATSAPP` | Mensagem que já vem escrita no WhatsApp |
+| `MENSAGEM_WHATSAPP` | Modelo da mensagem do WhatsApp; `{nome}`, `{whatsapp}`, `{queixa}`, `{periodo}` viram as respostas do lead |
 | `SEGUNDOS_ATE_WHATSAPP` | Espera antes de abrir o WhatsApp (padrão 5) |
 | `PLANILHA_URL` | URL `/exec` do Apps Script (veja abaixo) |
 | `META_PIXEL_ID` | ID do Pixel da Meta |

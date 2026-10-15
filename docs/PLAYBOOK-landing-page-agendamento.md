@@ -110,6 +110,7 @@ As perguntas mudam por cliente. Para cada campo novo, atualize **três lugares c
 1. `index.html`: o `<input>`/`<select>` com `name="chave"`.
 2. `assets/js/main.js`: validação em `validate()` e o campo no objeto `lead` (`chave: form.elements.chave.value`).
 3. `google-apps-script/Codigo.gs`: uma linha em `COLUNAS` (`['Título da coluna', 'chave']`).
+4. (Opcional) `MENSAGEM_WHATSAPP` no `config.js`: use `{chave}` para a resposta ir na mensagem do WhatsApp.
 
 Se as chaves não baterem, a coluna fica vazia na planilha. Máscara de telefone `(11) 90000-0000` já existe.
 
@@ -140,7 +141,8 @@ window.PRC_CONFIG = {
   VALOR_SINAL: 50,
   VALOR_CONSULTA: 600,
   WHATSAPP: "55DDDNUMERO",
-  MENSAGEM_WHATSAPP: "Olá, preenchi o formulário do site e gostaria de agendar meu horário",
+  // {chave} vira a resposta do lead (mesmas chaves do objeto `lead`); "\n" quebra linha
+  MENSAGEM_WHATSAPP: "Olá, preenchi o formulário do site e gostaria de agendar meu horário.\n\nNome: {nome}\nQueixa: {queixa}\nMelhor período: {periodo}",
   SEGUNDOS_ATE_WHATSAPP: 5,
   PLANILHA_URL: "",          // URL /exec do Apps Script
   META_PIXEL_ID: "",         // pixel do cliente

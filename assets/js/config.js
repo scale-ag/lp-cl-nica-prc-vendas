@@ -15,7 +15,10 @@ window.PRC_CONFIG = {
    * (para o evento Lead chegar na Meta e o lead cair na planilha)
    * e é levada automaticamente para este WhatsApp. */
   WHATSAPP: "5511969988757",
-  MENSAGEM_WHATSAPP: "Olá, preenchi o formulário do site e gostaria de agendar meu horário",
+  /* Modelo da mensagem. Campos entre chaves são trocados pelas respostas de cada lead:
+   *   {nome}  {whatsapp}  {queixa}  {periodo}
+   * "\n" quebra a linha. */
+  MENSAGEM_WHATSAPP: "Olá, preenchi o formulário do site e gostaria de agendar meu horário.\n\nNome: {nome}\nQueixa: {queixa}\nMelhor período: {periodo}",
   SEGUNDOS_ATE_WHATSAPP: 5,
 
   /* ---------- PLANILHA (Google Sheets) ----------

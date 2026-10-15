@@ -127,13 +127,21 @@
 
     track("Lead", { content_name: "Agendamento consulta PRC" }, { eventID: leadId });
     sendToSheet(lead);
-    showCountdown(lead.nome.split(" ")[0]);
+    showCountdown(lead);
   });
 
   /* ---------- Contagem e redirecionamento para o WhatsApp ----------
    * A espera dá tempo do evento Lead chegar na Meta e do lead cair na planilha. */
-  function showCountdown(firstName) {
-    var url = waLink(C.MENSAGEM_WHATSAPP);
+  /* Troca {nome}, {queixa}, {periodo}… do modelo pelas respostas do lead */
+  function fillTemplate(tpl, lead) {
+    return String(tpl || "").replace(/\{(\w+)\}/g, function (all, key) {
+      return lead[key] != null ? lead[key] : "";
+    });
+  }
+
+  function showCountdown(lead) {
+    var firstName = lead.nome.split(" ")[0];
+    var url = waLink(fillTemplate(C.MENSAGEM_WHATSAPP, lead));
     var left = Math.max(1, Number(C.SEGUNDOS_ATE_WHATSAPP) || 5);
     var countEl = $("#done-count"), btn = $("#done-whats");
 
